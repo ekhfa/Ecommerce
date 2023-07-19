@@ -19,7 +19,7 @@ function Signup() {
         console.log()
         if(res.data.Status === "Success"){
             console.log(res.data.Status);
-            navigate("/");
+            navigate("/product/1");
         }          
       })
       .catch((err) => console.log(err));
@@ -28,11 +28,11 @@ function Signup() {
   return (
     <div className="d-flex justify-content-center align-items-start mt-4 mb-4">
       <div style={{
-          backgroundColor: "#ccc", // Replace with your desired off-white color code
-          padding: "1.5rem",
-          borderRadius: "0.5rem",
-          width: "400px",
-          marginTop: "2rem", // Adjust the value to increase or decrease the distance from the header
+           backgroundColor: "#ccc", // Replace with your desired off-white color code
+           padding: "1rem",
+           borderRadius: "0.5rem",
+           width: "350px",
+           marginTop: "1.5rem", // Adjust the value to increase or decrease the distance from the header
         }}>
         <h2 className="text-center mb-4" style={{ fontSize: "2.5rem" }}>Sign In</h2>
         <form onSubmit={handleSubmit}>

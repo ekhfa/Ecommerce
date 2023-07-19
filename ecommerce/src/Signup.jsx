@@ -1,8 +1,8 @@
 import { useRef, useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import axios from "axios";
-import { Link, useNavigate } from "react-router-dom";
-
+import { toast } from "react-toastify";
+import { NavLink, useNavigate } from "react-router-dom";
 
 function Signup() {
   const [name, setName] = useState("");
@@ -15,10 +15,21 @@ function Signup() {
     e.preventDefault();
     axios
       .post("http://localhost:8080/register", { name, email, password, confirmPassword })
-      .then((res) => {
-        navigate("/Login");
+      .then((res) => {  
+
+        // toast.success("Registration successful. Please check your email to verify your account.", {
+        //   position: toast.POSITION.TOP_CENTER,
+        // });
+        alert("Registration successful. Please check your email to verify your account");
+        navigate("/login");
+       
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        // // toast.error(err.response.data.error, {
+        // //   position: toast.POSITION.TOP_CENTER,
+        // });
+
+      });
   };
 
   return (
@@ -93,12 +104,12 @@ function Signup() {
           </div>
         </form>
         <p className="text-center mt-3 mb-0">Already have an account?</p>
-        <Link
+        <NavLink
           to="/login"
           className="btn btn-default border bg-light w-100 mt-2 text-decoration-none"
         >
           Sign In 
-        </Link>
+        </NavLink>
       </div>
     </div>
   );
