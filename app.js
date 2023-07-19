@@ -86,7 +86,36 @@ app.post("/product", async (req, res) => {
   }
 });
 
+//This route is to fetch all the products from db
+app.get("/list-product", async (req, res) => {
+  try {
+    const products = await Product.find({ ["id"]: [1] });
+
+    res.json(products);
+  } catch (err) {
+    res.json(err);
+  }
+});
+
+//Route for fetch a product info from db by its id
 app.get("/product/:id", async (req, res) => {
+  try {
+    const productId = req.params.id;
+    const product = await Product.find({ ["id"]: [productId] });
+
+    if (product.length === 0) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    //returning the first element of the array
+    res.status(200).json(product[0]);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error while retrieving product" });
+  }
+});
+
+app.get("/static-product/:id", async (req, res) => {
   try {
     const productId = req.params.id;
     console.log("Id: ", productId);
