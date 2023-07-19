@@ -45,7 +45,7 @@ const ProductPage = ({ match }) => {
   return (
     <div className="product-page">
       <div className="product-details">
-        <img src={photo} alt={name} className="product-image" />
+        <img src={atob(photo)} alt={name} className="product-image" />
         <h1 className="product-title">{name}</h1>
         <div className="product-rating">
           <span className="star">&#9733;</span>

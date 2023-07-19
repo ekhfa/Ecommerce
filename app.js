@@ -78,7 +78,12 @@ const sendVerificationEmail = (email, token) => {
 
 app.post("/product", async (req, res) => {
   try {
-    const product = await Product.create(req.body);
+    let body = req.body;
+
+    //Converting photo path to base64 string
+    body.photo = Buffer.from(body.photo).toString("base64");
+
+    const product = await Product.create(body);
     res.status(200).json(product);
   } catch (error) {
     console.log(error);
@@ -108,7 +113,13 @@ app.get("/product/:id", async (req, res) => {
     }
 
     //returning the first element of the array
-    res.status(200).json(product[0]);
+    let productInfo = product[0];
+
+    // //decoding photo path from base64
+    // let encodedPath = productInfo?.photo;
+    // productInfo.photo = Buffer.from(encodedPath, "base64").toString("utf-8");
+
+    res.status(200).json(productInfo);
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Error while retrieving product" });
