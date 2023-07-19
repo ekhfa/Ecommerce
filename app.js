@@ -47,7 +47,7 @@ const transporter = nodemailer.createTransport({
 // Generate JWT token
 const generateToken = (user) => {
   const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-    expiresIn: "5m",
+    expiresIn: "1d",
   });
 
   console.log("Generated Token:", token);
@@ -55,7 +55,7 @@ const generateToken = (user) => {
 };
 
 const sendVerificationEmail = (email, token) => {
-  const verificationLink = `http://localhost:3000/verify-email/${token}`;
+  const verificationLink = `http://localhost:8080/verify-email/${token}`;
 
   const mailOptions = {
     from: process.env.GMAIL_EMAIL,
@@ -218,11 +218,12 @@ app.post("/login", (req, res) => {
       }
 
       bcrypt.compare(password, user.password, (err, response) => {
+        console.log("Response:", response);
         if (response) {
           const token = generateToken(user);
           res.cookie("token", token);
           console.log("Login Success");
-          return res.status(200).json({ status: "Success", role: user.role });
+          return res.status(200).json({ status: "Success" });
         } else {
           return res.status(401).json({ error: "Incorrect password" });
         }
@@ -237,14 +238,16 @@ app.post("/login", (req, res) => {
 // Verify email endpoint
 app.get("/verify-email/:token", async (req, res) => {
   const { token } = req.params;
+  //console.log("I am here");
 
   try {
     // Verify the token
+    //console.log("I am here 1");
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     // Get the user ID from the token payload
     const userId = decoded.userId;
-    console.log(userId);
+    //console.log(userId);
 
     // Update the user's account status to mark it as verified
     const updatedUser = User.findByIdAndUpdate(
@@ -256,8 +259,8 @@ app.get("/verify-email/:token", async (req, res) => {
     if (!updatedUser) {
       throw new Error("User not found");
     }
-    console.log(updatedUser);
-    res.redirect("/login");
+    //console.log(updatedUser);
+    res.redirect("http://localhost:3000/login");
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Internal Server Error" });
