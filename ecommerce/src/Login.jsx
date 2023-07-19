@@ -15,14 +15,19 @@ function Signup() {
     axios
       .post("http://localhost:8080/Login", { email, password})
       .then( res => {
-        console.log("Login: " , res.data.Status);
-        console.log()
-        if(res.data.Status === "Success"){
-            console.log(res.data.Status);
+        console.log("Login: " , res.data.status);
+        console.log("res: ", res)
+        if(res.data.status === "Success"){
+            console.log(res.data.status);
             navigate("/product/1");
-        }          
+        } else{
+          alert("Wrong Password!");
+        }         
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        console.log(err);
+        alert("Please Verify your Account!");
+      });
   };
 
   return (
