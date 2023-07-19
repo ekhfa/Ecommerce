@@ -140,6 +140,7 @@ app.get("/static-product/:id", async (req, res) => {
         reviews: 10,
         photo: "/p1.jpg",
         description: "This is an example product description.",
+        countInStock: 10,
       },
       {
         id: 2,
@@ -149,6 +150,7 @@ app.get("/static-product/:id", async (req, res) => {
         reviews: 10,
         photo: "/p2.jpg",
         description: "This is an example product1 description.",
+        countInStock: 10,
       },
       {
         id: 3,
@@ -158,6 +160,7 @@ app.get("/static-product/:id", async (req, res) => {
         reviews: 10,
         photo: "/p3.jpg",
         description: "This is an example product2 description.",
+        countInStock: 10,
       },
     ];
 

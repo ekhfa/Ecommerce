@@ -36,7 +36,7 @@ const productSchema = mongoose.Schema(
       type: Number,
       required: [false, "Enter Stock"],
     },
-    numofReviews: {
+    reviews: {
       type: Number,
       required: [false, "Enter Reviews"],
     },
