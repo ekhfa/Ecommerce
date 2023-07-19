@@ -4,6 +4,7 @@ const productSchema = mongoose.Schema(
   {
     id: {
       type: Number,
+      unique: [true, "id must be unique"],
       required: [true, "Enter Id"],
     },
     name: {
