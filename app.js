@@ -7,6 +7,7 @@ const User = require("./models/user");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const bcrypt = require("bcrypt");
+const nodemailer = require("nodemailer");
 
 const app = express();
 app.use(express.json());
@@ -21,16 +22,59 @@ app.use(
 
 app.use(cookieParser());
 
+// MongoDB connection setup
 mongoose
-  .connect(
-    "mongodb+srv://hossainekhfa:messi4455@productapi.l9kar5d.mongodb.net/product-info?retryWrites=true&w=majority"
-  )
+  .connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(() => {
     console.log("DB Connected!");
   })
   .catch((error) => {
     console.log(error);
   });
+
+// Nodemailer configuration using Gmail
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.GMAIL_EMAIL,
+    pass: process.env.GMAIL_PASSWORD,
+  },
+});
+
+// Generate JWT token
+const generateToken = (user) => {
+  const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+    expiresIn: "5m",
+  });
+
+  console.log("Generated Token:", token);
+  return token;
+};
+
+const sendVerificationEmail = (email, token) => {
+  const verificationLink = `http://localhost:3000/verify-email/${token}`;
+
+  const mailOptions = {
+    from: process.env.GMAIL_EMAIL,
+    to: email,
+    subject: "Email Verification",
+    html: `
+      <p>Click the link below to verify your email:</p>
+      <a href="${verificationLink}">${verificationLink}</a>
+    `,
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log("Email sent: " + info.response);
+    }
+  });
+};
 
 app.post("/product", async (req, res) => {
   try {
@@ -50,7 +94,7 @@ app.get("/product/:id", async (req, res) => {
     const products = [
       {
         id: 1,
-        name: "Example Product",
+        name: "Product1",
         price: 19.99,
         rating: 4.5,
         reviews: 10,
@@ -59,7 +103,7 @@ app.get("/product/:id", async (req, res) => {
       },
       {
         id: 2,
-        name: "Product1",
+        name: "Product2",
         price: 19,
         rating: 4,
         reviews: 10,
@@ -68,7 +112,7 @@ app.get("/product/:id", async (req, res) => {
       },
       {
         id: 3,
-        name: " Product2",
+        name: " Product3",
         price: 17,
         rating: 4.5,
         reviews: 10,
@@ -83,11 +127,6 @@ app.get("/product/:id", async (req, res) => {
 
     const product = products.find((product) => product.id == productId);
 
-    //res.status(200).json(product);
-
-    // // Logic to fetch the product based on the provided ID
-    // const product = await products.findById(productId);
-
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }
@@ -99,79 +138,91 @@ app.get("/product/:id", async (req, res) => {
   }
 });
 
-app.post("/register", (req, res) => {
-  const { name, email, password } = req.body;
+app.post("/register", async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
 
-  // bcrypt.hash(password, 10, function (err, hash) {
-  //   console.log(hash);
-  //   try {
-  //     User.create({ name, email, password: hash });
-  //   } catch (err) {
-  //     res.send(err);
-  //   }
-  // });
+    const user = await User.findOne({ email });
 
-  //res.json([name, email, password]);
-  bcrypt
-    .hash(password, 10)
-    .then((hash) => {
-      User.create({ name, email, password: hash })
-        .then((user) => res.status(201).json("Success"))
-        .catch((err) => {
-          console.log("I am here 1");
-          res.status(500).json(err);
-        });
-    })
-    .catch((err) => {
-      console.log("I am here 2");
-      res.status(500).json(err);
+    if (user) {
+      return res.status(400).json({ error: "Email already registered" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = new User({ name, email, password: hashedPassword });
+    await newUser.save();
+    console.log(newUser);
+
+    const token = generateToken(newUser);
+    sendVerificationEmail(email, token);
+
+    console.log(newUser);
+
+    res.status(201).json({
+      message: "Registration successful. Verification email sent.",
     });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 });
 
-app.post("/Login", (req, res) => {
+app.post("/login", (req, res) => {
   const { email, password } = req.body;
-  User.findOne({ email: email }).then((user) => {
-    if (user) {
+
+  User.findOne({ email })
+    .then((user) => {
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
       bcrypt.compare(password, user.password, (err, response) => {
         if (response) {
-          const token = jwt.sign(
-            { email: user.email, role: user.role },
-            "jwt-security-key",
-            {
-              expiresIn: "1d",
-            }
-          );
+          const token = generateToken(user);
           res.cookie("token", token);
           console.log("Login Success");
-          return res.status(200).json({ Status: "Success", role: user.role });
+          return res.status(200).json({ status: "Success", role: user.role });
         } else {
-          return res.status(500).json("Incorrect Password");
+          return res.status(401).json({ error: "Incorrect password" });
         }
       });
-    } else {
-      return res.status(404).json("No record Exist");
-    }
-  });
+    })
+    .catch((error) => {
+      console.log(error);
+      res.status(500).json({ error: "Internal Server Error" });
+    });
 });
 
-const varifyUser = (req, res, next) => {
-  const token = req.cookies.token;
-  if (!token) {
-    return res.json("Token is missing");
-  } else {
-    jwt.verify(token, "jwt-secret-key", (err, decoded) => {
-      if (err) {
-        return res.json("Error with token");
-      } else {
-        if (decoded.role === "admin") {
-          next();
-        } else {
-          return res.json("not admin");
-        }
-      }
-    });
+// Verify email endpoint
+app.get("/verify-email/:token", async (req, res) => {
+  const { token } = req.params;
+
+  try {
+    // Verify the token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    // Get the user ID from the token payload
+    const userId = decoded.userId;
+    console.log(userId);
+
+    // Update the user's account status to mark it as verified
+    const updatedUser = User.findByIdAndUpdate(
+      userId,
+      { isVerified: true },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      throw new Error("User not found");
+    }
+    console.log(updatedUser);
+    res.redirect("/login");
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
-};
+});
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, console.log(`Server started on port ${PORT}`));
