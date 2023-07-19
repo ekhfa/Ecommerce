@@ -2,6 +2,11 @@ const mongoose = require("mongoose");
 
 const productSchema = mongoose.Schema(
   {
+    id: {
+      type: Number,
+      unique: [true, "id must be unique"],
+      required: [true, "Enter Id"],
+    },
     name: {
       type: String,
       required: [true, "Enter Product Name"],
@@ -31,7 +36,7 @@ const productSchema = mongoose.Schema(
       type: Number,
       required: [false, "Enter Stock"],
     },
-    numofReviews: {
+    reviews: {
       type: Number,
       required: [false, "Enter Reviews"],
     },

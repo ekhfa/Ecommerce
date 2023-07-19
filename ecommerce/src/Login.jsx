@@ -15,24 +15,29 @@ function Signup() {
     axios
       .post("http://localhost:8080/Login", { email, password})
       .then( res => {
-        console.log("Login: " , res.data.Status);
-        console.log()
-        if(res.data.Status === "Success"){
-            console.log(res.data.Status);
-            navigate("/");
-        }          
+        console.log("Login: " , res.data.status);
+        console.log("res: ", res)
+        if(res.data.status === "Success"){
+            console.log(res.data.status);
+            navigate("/product/1");
+        } else{
+          alert("Wrong Password!");
+        }         
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        console.log(err);
+        alert("Please Verify your Account!");
+      });
   };
 
   return (
     <div className="d-flex justify-content-center align-items-start mt-4 mb-4">
       <div style={{
-          backgroundColor: "#ccc", // Replace with your desired off-white color code
-          padding: "1.5rem",
-          borderRadius: "0.5rem",
-          width: "400px",
-          marginTop: "2rem", // Adjust the value to increase or decrease the distance from the header
+           backgroundColor: "#ccc", // Replace with your desired off-white color code
+           padding: "1rem",
+           borderRadius: "0.5rem",
+           width: "350px",
+           marginTop: "1.5rem", // Adjust the value to increase or decrease the distance from the header
         }}>
         <h2 className="text-center mb-4" style={{ fontSize: "2.5rem" }}>Sign In</h2>
         <form onSubmit={handleSubmit}>
