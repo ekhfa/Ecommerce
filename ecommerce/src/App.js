@@ -9,8 +9,9 @@ import Home from "./Home";
 import Login from "./Login";
 import Signup from "./Signup";
 import ProductPage from "./product/ProductPage";
-import { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const App = () => {
   const theme = {
@@ -45,8 +46,9 @@ const App = () => {
         <Route path="/product/:id" element={<ProductPage />} />
         <Route path="/register" element={<Signup />} />
         <Route path="/" element={<Home />} />
-        <Route path="/Login" element={<Login />} />
+        <Route path="/login" element={<Login />} />
       </Routes>
+      {/* <ToastContainer /> */}
     </ThemeProvider>
   );
 };
