@@ -91,17 +91,6 @@ app.post("/product", async (req, res) => {
   }
 });
 
-//This route is to fetch all the products from db
-app.get("/list-product", async (req, res) => {
-  try {
-    const products = await Product.find({ ["id"]: [1] });
-
-    res.json(products);
-  } catch (err) {
-    res.json(err);
-  }
-});
-
 //Route for fetch a product info from db by its id
 app.get("/product/:id", async (req, res) => {
   try {
@@ -178,6 +167,17 @@ app.get("/static-product/:id", async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Error while retrieving product" });
+  }
+});
+
+// Add this route to fetch all products
+app.get("/products", async (req, res) => {
+  try {
+    const products = await Product.find();
+    res.json(products);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error while retrieving products" });
   }
 });
 
