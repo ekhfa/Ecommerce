@@ -12,6 +12,7 @@ import ProductPage from "./product/ProductPage";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import OrderSummaryPage from "./product/OrderSummaryPage";
 
 const App = () => {
   const theme = {
@@ -47,6 +48,10 @@ const App = () => {
         <Route path="/register" element={<Signup />} />
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
+        <Route
+          path="/order-summary/:id/:quantity"
+          element={<OrderSummaryPage />}
+        />
       </Routes>
       {/* <ToastContainer /> */}
     </ThemeProvider>

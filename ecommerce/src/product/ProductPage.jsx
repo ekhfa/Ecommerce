@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import RegistrationAndPaymentSidebar from './RegistrationAndPaymentSidebar';
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import './ProductPage.css';
+import OrderSummaryPage from './OrderSummaryPage';
 
 const ProductPage = () => {
   const [product, setProduct] = useState(null);
-  const [showSidebar, setShowSidebar] = useState(false);
   const [quantity, setQuantity] = useState(1);
-
-
   const { id } = useParams();
+  const navigate = useNavigate();
+ 
 
   useEffect(() => {
     // Fetch product information from the backend API
@@ -33,15 +32,14 @@ const ProductPage = () => {
   const { name, price, rating, reviews, photo, description, countInStock } = product;
   
   const handleBuyNow = () => {
-    setShowSidebar(true);
+    // Redirect to the order summary page with necessary data
+    console.log('Buy Now button clicked');
+    navigate(`/order-summary/${id}/${quantity}`);
   };
+
   
   const handleAddToCart = () => {
     console.log('Add to Cart clicked');
-  };
-
-  const toggleSidebar = () => {
-    setShowSidebar(!showSidebar);
   };
 
   const calculateTotalPrice = () => {
@@ -62,31 +60,14 @@ const ProductPage = () => {
         <div className="stock">Stock: {product.countInStock}</div>
         <img src={atob(product.photo)} alt={product.name} className="product-image" />
         <div className="button-container">
-          <button className="product-button buy-now" onClick={toggleSidebar}>
+          <button className="product-button buy-now" onClick={handleBuyNow}>
             Buy Now
           </button>
           <button className="product-button add-to-cart">Add to Cart</button>
         </div>
       </div>
-
-      {showSidebar && (
-        <div className="sidebar">
-          <h2>Product Summary</h2>
-          <p>Name: {product.name}</p>
-          <p>Price: ${product.price}</p>
-          <label>Quantity: </label>
-          <input
-            type="number"
-            min="1"
-            value={quantity}
-            onChange={(e) => setQuantity(parseInt(e.target.value))}
-          />
-          <p>Total Price: ${calculateTotalPrice()}</p>
-          <button onClick={toggleSidebar}>Close</button>
-        </div>
-      )}
-    </div>
-  );
-};
+  </div>
+);
+}
 
 export default ProductPage;
