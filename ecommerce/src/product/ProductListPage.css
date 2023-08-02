@@ -1,0 +1,30 @@
+.product-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 20px;
+    padding: 20px;
+  }
+  
+  .product-box {
+    border: 1px solid #e0e0e0;
+    padding: 20px;
+    border-radius: 4px;
+    text-align: center;
+  }
+  
+  .product-box img {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 10px;
+  }
+  
+  .product-name {
+    font-size: 16px;
+    margin-bottom: 5px;
+  }
+  
+  .product-price {
+    font-size: 18px;
+    color: #e65100;
+  }
+  
