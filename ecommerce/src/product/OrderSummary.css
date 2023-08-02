@@ -1,0 +1,55 @@
+/* Apply the styling to the order summary page */
+.order-summary-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f7f7f7;
+  }
+  
+  /* Style the box container for the order summary */
+  .order-summary-box {
+    max-width: 600px;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Style the title of the order summary */
+  .order-summary-title {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+  
+  /* Style the product information */
+  .order-summary-info {
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
+  
+  /* Style the quantity section */
+  .order-summary-quantity {
+    font-size: 14px;
+    margin-bottom: 10px;
+  }
+  
+  /* Style the buttons for quantity adjustment */
+  .quantity-button {
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 10px;
+    cursor: pointer;
+    margin: 0 5px;
+  }
+  
+  /* Style the total price */
+  .order-summary-price {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  
+  
