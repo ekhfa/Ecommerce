@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import RegistrationAndPaymentSidebar from './RegistrationAndPaymentSidebar';
 import { useParams } from "react-router-dom";
 import './ProductPage.css';
 
 const ProductPage = () => {
   const [product, setProduct] = useState(null);
+  const [showSidebar, setShowSidebar] = useState(false);
+  const [quantity, setQuantity] = useState(1);
+
 
   const { id } = useParams();
 
@@ -27,37 +31,62 @@ const ProductPage = () => {
   }
 
   const { name, price, rating, reviews, photo, description, countInStock } = product;
-
+  
   const handleBuyNow = () => {
-    console.log('Buy Now clicked');
+    setShowSidebar(true);
   };
-
+  
   const handleAddToCart = () => {
     console.log('Add to Cart clicked');
+  };
+
+  const toggleSidebar = () => {
+    setShowSidebar(!showSidebar);
+  };
+
+  const calculateTotalPrice = () => {
+    return product.price * quantity;
   };
 
  
   return (
     <div className="product-page">
       <div className="product-details">
-        <h1 className="product-title">{name}</h1> 
-        <p className="product-description">{description}</p> 
-        <div className="price">Price: {price}</div> 
-        <div className="rating">Rating: {rating}</div> 
-        <div className="reviews">Reviews: {reviews}</div> 
-        <div className="stock">Stock: {countInStock}</div> 
-        <img src={atob(photo)} alt={name} className="product-image" />
+        <h1 className="product-title">{product.name}</h1>
+        <p className="product-description">{product.description}</p>
+        <div className="price">Price: ${product.price}</div>
+        <div className="rating">
+          Rating: <span className="star">&#9733;</span> {product.rating}
+        </div>
+        <div className="reviews">Reviews: {product.reviews}</div>
+        <div className="stock">Stock: {product.countInStock}</div>
+        <img src={atob(product.photo)} alt={product.name} className="product-image" />
         <div className="button-container">
-          <button className="product-button buy-now" onClick={handleBuyNow}>
+          <button className="product-button buy-now" onClick={toggleSidebar}>
             Buy Now
           </button>
-          <button className="product-button add-to-cart" onClick={handleAddToCart}>
-            Add to Cart
-          </button>
+          <button className="product-button add-to-cart">Add to Cart</button>
         </div>
       </div>
+
+      {showSidebar && (
+        <div className="sidebar">
+          <h2>Product Summary</h2>
+          <p>Name: {product.name}</p>
+          <p>Price: ${product.price}</p>
+          <label>Quantity: </label>
+          <input
+            type="number"
+            min="1"
+            value={quantity}
+            onChange={(e) => setQuantity(parseInt(e.target.value))}
+          />
+          <p>Total Price: ${calculateTotalPrice()}</p>
+          <button onClick={toggleSidebar}>Close</button>
+        </div>
+      )}
     </div>
   );
-  };  
+};
 
 export default ProductPage;
