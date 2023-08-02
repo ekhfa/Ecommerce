@@ -270,5 +270,40 @@ app.get("/verify-email/:token", async (req, res) => {
   }
 });
 
+// ... (existing code)
+
+// Route to handle "Buy Now" process
+app.post("/buy-now", async (req, res) => {
+  try {
+    const { userId, productId } = req.body;
+
+    // Check if the user is logged in (validate the token)
+    const decodedToken = jwt.verify(req.cookies.token, process.env.JWT_SECRET);
+
+    if (decodedToken.userId !== userId) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    // Fetch the product by productId
+    const product = await Product.findById(productId);
+
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    // Here, you would initiate the actual payment process using a payment gateway
+    // For this example, we'll just simulate a successful payment
+    const paymentInfo = {
+      status: "success",
+      paymentId: "1234567890",
+    };
+
+    res.status(200).json({ message: "Payment successful", paymentInfo });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, console.log(`Server started on port ${PORT}`));
