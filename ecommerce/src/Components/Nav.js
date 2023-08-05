@@ -2,8 +2,10 @@ import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import styled from "styled-components";
 import { CgMenu, CgCloseR } from "react-icons/cg";
+import LogoutButton from "../User/LogoutButton";
 
 const Nav = () => {
+  // Passing isLoggedIn and userName as props
   const [openMenu, setOpenMenu] = useState(false);
 
   const StyledNav = styled.nav`
@@ -108,6 +110,7 @@ const Nav = () => {
               Product
             </NavLink>
           </li>
+
           <li>
             <NavLink
               className="navbar-link"
