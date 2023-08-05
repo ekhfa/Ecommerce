@@ -3,7 +3,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 
-function Signup() {
+function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
@@ -13,7 +13,7 @@ function Signup() {
   const handleSubmit = (e) => {
     e.preventDefault();
     axios
-      .post("http://localhost:8080/Login", { email, password})
+      .post("http://localhost:8080/login", { email, password})
       .then( res => {
         console.log("Login: " , res.data.status);
         console.log("res: ", res)
@@ -87,4 +87,4 @@ function Signup() {
   );
 }
 
-export default Signup;
+export default Login;
