@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "./App.css";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { GlobalStyle } from "./GlobalStyle";
@@ -6,14 +6,17 @@ import { ThemeProvider } from "styled-components";
 import Header from "./Components/Header";
 import Nav from "./Components/Nav";
 import Home from "./Home";
-import Login from "./Login";
-import Signup from "./Signup";
+import axios from "axios";
+import Login from "./User/Login";
+import Signup from "./User/Signup";
 import ProductPage from "./product/ProductPage";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import OrderSummaryPage from "./product/OrderSummaryPage";
 import ProductListPage from "./product/ProductListPage";
+import LogoutButton from "./User/LogoutButton";
+import UserProfile from "./User/UserProfile";
 
 const App = () => {
   const theme = {
@@ -40,15 +43,37 @@ const App = () => {
       tab: "998px",
     },
   };
+
+  ///const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userName, setUserName] = useState("");
+
+  // useEffect(() => {
+  //   // Check if the user is already authenticated
+  //   axios
+  //     .get("http://localhost:8080/check-auth")
+  //     .then((res) => {
+  //       if (res.data.isAuthenticated) {
+  //         setIsLoggedIn(true);
+  //         setUserName(res.data.name);
+  //       }
+  //     })
+  //     .catch((err) => {
+  //       console.log(err);
+  //     });
+  // }, []);
+
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyle />
       <Header />
+      {/* <Nav isLoggedIn={isLoggedIn} userName={userName} /> */}
       <Routes>
         <Route path="/product/:id" element={<ProductPage />} />
         <Route path="/register" element={<Signup />} />
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/userProfile" element={<UserProfile />} />
+
         <Route
           path="/order-summary/:id/:quantity"
           element={<OrderSummaryPage />}

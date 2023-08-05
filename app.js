@@ -8,6 +8,7 @@ const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
+const { resolve } = require("path-browserify");
 
 const app = express();
 app.use(express.json());
@@ -47,7 +48,7 @@ const transporter = nodemailer.createTransport({
 // Generate JWT token
 const generateToken = (user) => {
   const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-    expiresIn: "1d",
+    expiresIn: "2d",
   });
 
   console.log("Generated Token:", token);
@@ -115,60 +116,60 @@ app.get("/product/:id", async (req, res) => {
   }
 });
 
-app.get("/static-product/:id", async (req, res) => {
-  try {
-    const productId = req.params.id;
-    console.log("Id: ", productId);
+// app.get("/static-product/:id", async (req, res) => {
+//   try {
+//     const productId = req.params.id;
+//     console.log("Id: ", productId);
 
-    const products = [
-      {
-        id: 1,
-        name: "Product1",
-        price: 19.99,
-        rating: 4.5,
-        reviews: 10,
-        photo: "/p1.jpg",
-        description: "This is an example product description.",
-        countInStock: 10,
-      },
-      {
-        id: 2,
-        name: "Product2",
-        price: 19,
-        rating: 4,
-        reviews: 10,
-        photo: "/p2.jpg",
-        description: "This is an example product1 description.",
-        countInStock: 10,
-      },
-      {
-        id: 3,
-        name: " Product3",
-        price: 17,
-        rating: 4.5,
-        reviews: 10,
-        photo: "/p3.jpg",
-        description: "This is an example product2 description.",
-        countInStock: 10,
-      },
-    ];
+//     const products = [
+//       {
+//         id: 1,
+//         name: "Product1",
+//         price: 19.99,
+//         rating: 4.5,
+//         reviews: 10,
+//         photo: "/p1.jpg",
+//         description: "This is an example product description.",
+//         countInStock: 10,
+//       },
+//       {
+//         id: 2,
+//         name: "Product2",
+//         price: 19,
+//         rating: 4,
+//         reviews: 10,
+//         photo: "/p2.jpg",
+//         description: "This is an example product1 description.",
+//         countInStock: 10,
+//       },
+//       {
+//         id: 3,
+//         name: " Product3",
+//         price: 17,
+//         rating: 4.5,
+//         reviews: 10,
+//         photo: "/p3.jpg",
+//         description: "This is an example product2 description.",
+//         countInStock: 10,
+//       },
+//     ];
 
-    const findProductById = (productId) => {
-      return products.find((product) => product.id == productId);
-    };
+//     const findProductById = (productId) => {
+//       return products.find((product) => product.id == productId);
+//     };
 
-    const product = products.find((product) => product.id == productId);
+//     const product = products.find((product) => product.id == productId);
 
-    if (!product) {
-      return res.status(404).json({ message: "Product not found" });
-    }
+//     if (!product) {
+//       return res.status(404).json({ message: "Product not found" });
+//     }
 
-    res.status(200).json(product);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Error while retrieving product" });
-  }
-});
+//     res.status(200).json(product);
+//   } catch (error) {
+//     console.log(error);
+//     res.status(500).json({ message: "Error while retrieving product" });
+//   }
+// });
 
 // Add this route to fetch all products
 app.get("/products", async (req, res) => {
@@ -224,9 +225,9 @@ app.post("/login", (req, res) => {
         console.log("Response:", response);
         if (response) {
           const token = generateToken(user);
-          res.cookie("token", token);
+          res.cookie("token", token, { httpOnly: true, sameSite: "strict" });
           console.log("Login Success");
-          return res.status(200).json({ status: "Success" });
+          return res.status(200).json({ status: "Success", name: user.name });
         } else {
           return res.status(401).json({ error: "Incorrect password" });
         }
@@ -253,7 +254,7 @@ app.get("/verify-email/:token", async (req, res) => {
     //console.log(userId);
 
     // Update the user's account status to mark it as verified
-    const updatedUser = User.findByIdAndUpdate(
+    const updatedUser = await User.findByIdAndUpdate(
       userId,
       { isVerified: true },
       { new: true }
@@ -273,36 +274,94 @@ app.get("/verify-email/:token", async (req, res) => {
 // ... (existing code)
 
 // Route to handle "Buy Now" process
-app.post("/buy-now", async (req, res) => {
+// app.post("/buy-now", async (req, res) => {
+//   try {
+//     const { userId, productId } = req.body;
+
+//     // Check if the user is logged in (validate the token)
+//     const decodedToken = jwt.verify(req.cookies.token, process.env.JWT_SECRET);
+
+//     if (decodedToken.userId !== userId) {
+//       return res.status(401).json({ error: "Unauthorized" });
+//     }
+
+//     // Fetch the product by productId
+//     const product = await Product.findById(productId);
+
+//     if (!product) {
+//       return res.status(404).json({ message: "Product not found" });
+//     }
+
+//     // Here, you would initiate the actual payment process using a payment gateway
+//     // For this example, we'll just simulate a successful payment
+//     const paymentInfo = {
+//       status: "success",
+//       paymentId: "1234567890",
+//     };
+
+//     res.status(200).json({ message: "Payment successful", paymentInfo });
+//   } catch (error) {
+//     console.log(error);
+//     res.status(500).json({ error: "Internal Server Error" });
+//   }
+// });
+
+app.get("/check-auth", (req, res) => {
   try {
-    const { userId, productId } = req.body;
-
-    // Check if the user is logged in (validate the token)
-    const decodedToken = jwt.verify(req.cookies.token, process.env.JWT_SECRET);
-
-    if (decodedToken.userId !== userId) {
-      return res.status(401).json({ error: "Unauthorized" });
+    console.log("Check Authentication Token:", req.cookies.token);
+    //Check if the user is authenticated
+    if (req.cookies.token) {
+      // User is authenticated
+      const decodedToken = jwt.verify(
+        req.cookies.token,
+        process.env.JWT_SECRET
+      );
+      res.status(200).json({ isAuthenticated: true });
+    } else {
+      // User is not authenticated
+      console.log("No token found in cookies12");
+      res.status(200).json({ isAuthenticated: false });
+      //console.log("Not Authenticated");
     }
-
-    // Fetch the product by productId
-    const product = await Product.findById(productId);
-
-    if (!product) {
-      return res.status(404).json({ message: "Product not found" });
-    }
-
-    // Here, you would initiate the actual payment process using a payment gateway
-    // For this example, we'll just simulate a successful payment
-    const paymentInfo = {
-      status: "success",
-      paymentId: "1234567890",
-    };
-
-    res.status(200).json({ message: "Payment successful", paymentInfo });
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Internal Server Error" });
   }
+});
+
+app.get("/user-profile", (req, res) => {
+  try {
+    if (!req.cookies.token) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    console.log("I am here");
+    const decodedToken = jwt.verify(req.cookies.token, process.env.JWT_SECRET);
+    const userId = decodedToken.userId;
+    console.log("Received Token:", req.cookies.token);
+    //Fetch user data using the user ID
+
+    User.findById(userId)
+      .select("-password  -_id -isVerified -__v") // Exclude the password field from the response
+      .then((user) => {
+        if (!user) {
+          return res.status(404).json({ message: "User not found" });
+        }
+        res.status(200).json(user);
+      })
+      .catch((error) => {
+        console.log(error);
+        res.status(500).json({ error: "Internal Server Error" });
+      });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+app.post("/logout", (req, res) => {
+  // Clear any authentication-related data
+  res.clearCookie("token"); // Clear the token cookie
+  res.status(200).json({ message: "Logged out successfully" });
 });
 
 const PORT = process.env.PORT || 8080;
